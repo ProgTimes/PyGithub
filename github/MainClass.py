@@ -185,6 +185,7 @@ class Github:
         auth: github.Auth.Auth | None = None,
         # v3: set lazy = True as the default
         lazy: bool = False,
+        proxies: dict | None = None
     ) -> None:
         """
         :param login_or_token: string deprecated, use auth=github.Auth.Login(...) or auth=github.Auth.Token(...) instead
@@ -262,6 +263,7 @@ class Github:
             seconds_between_requests,
             seconds_between_writes,
             lazy,
+            proxies,
         )
 
     def withLazy(self, lazy: bool) -> Github:

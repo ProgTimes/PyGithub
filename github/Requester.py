@@ -154,6 +154,7 @@ class HTTPSRequestsConnectionClass:
         timeout: Optional[int] = None,
         retry: Optional[Union[int, Retry]] = None,
         pool_size: Optional[int] = None,
+        proxies: Optional[dict] = None,
         **kwargs: Any,
     ) -> None:
         self.port = port if port else 443
@@ -162,6 +163,8 @@ class HTTPSRequestsConnectionClass:
         self.timeout = timeout
         self.verify = kwargs.get("verify", True)
         self.session = requests.Session()
+        if proxies:
+            self.session.proxies = proxies
         # having Session.auth set something other than None disables falling back to .netrc file
         # https://github.com/psf/requests/blob/d63e94f552ebf77ccf45d97e5863ac46500fa2c7/src/requests/sessions.py#L480-L481
         # see https://github.com/PyGithub/PyGithub/pull/2703
@@ -190,6 +193,7 @@ class HTTPSRequestsConnectionClass:
         url: str,
         input: Optional[Union[str, io.BufferedReader]],
         headers: Dict[str, str],
+        proxies: dict = None,
     ) -> None:
         self.verb = verb
         self.url = url
@@ -223,6 +227,7 @@ class HTTPRequestsConnectionClass:
         timeout: Optional[int] = None,
         retry: Optional[Union[int, Retry]] = None,
         pool_size: Optional[int] = None,
+        proxies: Optional[dict] = None,
         **kwargs: Any,
     ):
         self.port = port if port else 80
@@ -231,6 +236,8 @@ class HTTPRequestsConnectionClass:
         self.timeout = timeout
         self.verify = kwargs.get("verify", True)
         self.session = requests.Session()
+        if proxies:
+            self.session.proxies = proxies
         # having Session.auth set something other than None disables falling back to .netrc file
         # https://github.com/psf/requests/blob/d63e94f552ebf77ccf45d97e5863ac46500fa2c7/src/requests/sessions.py#L480-L481
         # see https://github.com/PyGithub/PyGithub/pull/2703
@@ -395,6 +402,7 @@ class Requester:
         pool_size: Optional[int],
         seconds_between_requests: Optional[float] = None,
         seconds_between_writes: Optional[float] = None,
+        proxies: Optional[dict] = None,
         lazy: bool = False,
     ):
         self._initializeDebugFeature()
@@ -415,6 +423,7 @@ class Requester:
         self.__seconds_between_writes = seconds_between_writes
         self.__last_requests: Dict[str, float] = dict()
         self.__scheme = o.scheme
+        self.__proxies = proxies
         if o.scheme == "https":
             self.__connectionClass = self.__httpsConnectionClass
         elif o.scheme == "http":
@@ -1144,6 +1153,7 @@ class Requester:
                 pool_size=self.__pool_size,
                 timeout=self.__timeout,
                 verify=self.__verify,
+                proxies=self.__proxies,
             )
 
         return self.__connection
